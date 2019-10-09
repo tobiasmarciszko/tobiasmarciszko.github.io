@@ -6,11 +6,6 @@ body {
   background-color: black;
 }
 
-h1 {
-  color: maroon;
-  margin-left: 40px;
-}
-
 canvas {
     position: fixed;
     top: 50%;
@@ -37,7 +32,7 @@ canvas {
     var brz = {x:1, y:-1, z:7}
     var tlz = {x:-1, y:1, z:7}
     var trz = {x:1, y:1, z:7}
-    
+
 function worldToScreen(p) {
     let factor = 640
     var screen = {x: p.x / p.z * factor + 320, y: p.y / p.z * factor + 240}
@@ -46,15 +41,15 @@ function worldToScreen(p) {
 
 function rotateZ(p) {
   var angle = 0.0174444
-  var point = {x: p.x - p.y*angle, y:p.y + p.x*angle, z: p.z}
+  var point = {x: p.x*Math.cos(angle) - p.y*Math.sin(angle), y:p.y*Math.cos(angle) + p.x*Math.sin(angle), z: p.z}
   return point;
 }
 
 function rotateX(p) {
     var angle = 0.0174444
     var z = p.z - 6
-    var y = p.y - z*angle
-    var zz = (p.y*angle + z) + 6
+    var y = p.y*Math.cos(angle) - z*Math.sin(angle)
+    var zz = (p.y*Math.sin(angle) + z*Math.cos(angle)) + 6
     var point = {x: p.x, y: y, z: zz}
     return point
 }
@@ -62,8 +57,8 @@ function rotateX(p) {
 function rotateY(p) {
     var angle = 0.0174444
     var z = p.z - 6
-    var x = p.x + z*angle
-    var zz = (-p.x*angle + z) + 6
+    var x = p.x*Math.cos(angle) + z*Math.sin(angle)
+    var zz = (-p.x*Math.sin(angle) + z*Math.cos(angle)) + 6
     var point = {x: x, y: p.y, z: zz}
     return point
 }
@@ -187,12 +182,3 @@ function drawLine(p0, p1) {
 
 </body>
 </html>
-
-<!--
-
-
-
-
-
-
--->
