@@ -23,7 +23,7 @@ canvas {
 
 <body>
 <div>
-<canvas id="canvas" width="320" height="240" class="canvas"></canvas>
+<canvas id="canvas" width=640 height=480 class="canvas"></canvas>
 </div>
 
 <script>
@@ -39,20 +39,19 @@ canvas {
     var trz = {x:1, y:1, z:7}
     
 function worldToScreen(p) {
-    let factor = 320
-    var screen = {x: p.x / p.z * factor + 160, y: p.y / p.z * factor + 120}
+    let factor = 640
+    var screen = {x: p.x / p.z * factor + 320, y: p.y / p.z * factor + 240}
     return screen
 }
 
 function rotateZ(p) {
-  var angle = 0.01745
+  var angle = 0.0174444
   var point = {x: p.x - p.y*angle, y:p.y + p.x*angle, z: p.z}
   return point;
 }
 
 function rotateX(p) {
-    var angle = 0.01745
-
+    var angle = 0.0174444
     var z = p.z - 6
     var y = p.y - z*angle
     var zz = (p.y*angle + z) + 6
@@ -60,6 +59,14 @@ function rotateX(p) {
     return point
 }
 
+function rotateY(p) {
+    var angle = 0.0174444
+    var z = p.z - 6
+    var x = p.x + z*angle
+    var zz = (-p.x*angle + z) + 6
+    var point = {x: x, y: p.y, z: zz}
+    return point
+}
 
 function drawPixel(point) {
      context.fillStyle = "#FFFF"
@@ -83,8 +90,8 @@ function drawLine(p0, p1) {
     while (x0!=x1 || y0!=y1) {
        if (x0 >= 0 &&
            y0 >= 0 &&
-           x0 < 320 &&
-           y0 < 240) {
+           x0 < 640 &&
+           y0 < 480) {
            var p = {x: x0, y: y0}
            drawPixel(p)
        }
@@ -104,25 +111,34 @@ function drawLine(p0, p1) {
 
    function update() {
      context.fillStyle = "#000";
-     context.fillRect(0, 0, 320, 240);
+     context.fillRect(0, 0, 640, 480);
      
-     bl = rotateX(bl)
+     bl = rotateZ(bl)
      br = rotateZ(br)
-     tl = rotateX(tl)
+     tl = rotateZ(tl)
      tr = rotateZ(tr)
-     blz = rotateX(blz)
+     blz = rotateZ(blz)
      brz = rotateZ(brz)
-     tlz = rotateX(tlz)
+     tlz = rotateZ(tlz)
      trz = rotateZ(trz)
 
-bl = rotateX(bl)
-br = rotateX(br)
-tl = rotateX(tl)
-tr = rotateX(tr)
-blz = rotateX(blz)
-brz = rotateX(brz)
-tlz = rotateX(tlz)
-trz = rotateX(trz)
+    bl = rotateX(bl)
+    br = rotateX(br)
+    tl = rotateX(tl)
+    tr = rotateX(tr)
+    blz = rotateX(blz)
+    brz = rotateX(brz)
+    tlz = rotateX(tlz)
+    trz = rotateX(trz)
+
+    bl = rotateY(bl)
+    br = rotateY(br)
+    tl = rotateY(tl)
+    tr = rotateY(tr)
+    blz = rotateY(blz)
+    brz = rotateY(brz)
+    tlz = rotateY(tlz)
+    trz = rotateY(trz)
 
      var blr = worldToScreen(bl)
      var brr = worldToScreen(br)
