@@ -1,60 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  background-color: black;
+}
 
+h1 {
+  color: maroon;
+  margin-left: 40px;
+}
+
+canvas {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+</style>
+</head>
+
+<body>
 <div>
-<canvas id="canvas" width="320" height="240"></canvas>
+<canvas id="canvas" width="320" height="240" class="canvas"></canvas>
 </div>
 
-
 <script>
-  
+
     var bl = {x:-1, y:-1, z:5}
     var br = {x:1, y:-1, z:5}
     var tl = {x:-1, y:1, z:5}
-    var tr = {x:1, y:1, z:5} 
+    var tr = {x:1, y:1, z:5}
+
+    var blz = {x:-1, y:-1, z:7}
+    var brz = {x:1, y:-1, z:7}
+    var tlz = {x:-1, y:1, z:7}
+    var trz = {x:1, y:1, z:7}
     
- function worldToScreen(p) {
+function worldToScreen(p) {
     let factor = 320
     var screen = {x: p.x / p.z * factor + 160, y: p.y / p.z * factor + 120}
     return screen
 }
 
 function rotateZ(p) {
-  var point = {x: p.x - p.y*0.017444444, y:p.y + p.x*0.017444444, z: p.z}
+  var angle = 0.01745
+  var point = {x: p.x - p.y*angle, y:p.y + p.x*angle, z: p.z}
   return point;
 }
-    
-   function drawPixel(point) {
+
+function rotateX(p) {
+    var angle = 0.01745
+
+    var z = p.z - 6
+    var y = p.y - z*angle
+    var zz = (p.y*angle + z) + 6
+    var point = {x: p.x, y: y, z: zz}
+    return point
+}
+
+
+function drawPixel(point) {
      context.fillStyle = "#FFFF"
-     context.fillRect(point.x, point.y, 2, 2)
+     context.fillRect(point.x, point.y, 1, 1)
    }
+
+
+function drawLine(p0, p1) {
+    var x0 = parseInt(p0.x)
+    var x1 = parseInt(p1.x)
+
+    var y0 = parseInt(p0.y)
+    var y1 = parseInt(p1.y)
+
+    var dx = Math.abs(x1 - x0)
+    var dy = Math.abs(y1 - y0)
+    var sx = (x0 < x1) ? 1 : -1
+    var sy = (y0 < y1) ? 1 : -1
+    var err = dx - dy
+
+    while (x0!=x1 || y0!=y1) {
+       if (x0 >= 0 &&
+           y0 >= 0 &&
+           x0 < 320 &&
+           y0 < 240) {
+           var p = {x: x0, y: y0}
+           drawPixel(p)
+       }
+
+       var e2 = 2 * err
+       if (e2 > -dy) {
+        err -= dy
+        x0 += sx
+       }
+
+       if (e2 < dx) {
+        err += dx
+        y0 += sy
+       }
+    }
+}
 
    function update() {
      context.fillStyle = "#000";
      context.fillRect(0, 0, 320, 240);
      
-     bl = rotateZ(bl)
+     bl = rotateX(bl)
      br = rotateZ(br)
-     tl = rotateZ(tl)
+     tl = rotateX(tl)
      tr = rotateZ(tr)
-               
+     blz = rotateX(blz)
+     brz = rotateZ(brz)
+     tlz = rotateX(tlz)
+     trz = rotateZ(trz)
+
+bl = rotateX(bl)
+br = rotateX(br)
+tl = rotateX(tl)
+tr = rotateX(tr)
+blz = rotateX(blz)
+brz = rotateX(brz)
+tlz = rotateX(tlz)
+trz = rotateX(trz)
+
      var blr = worldToScreen(bl)
      var brr = worldToScreen(br)
      var tlr = worldToScreen(tl)
      var trr = worldToScreen(tr)
+
+    var blrz = worldToScreen(blz)
+    var brrz = worldToScreen(brz)
+    var tlrz = worldToScreen(tlz)
+    var trrz = worldToScreen(trz)
      
      drawPixel(blr)
      drawPixel(brr)
      drawPixel(tlr)
-     drawPixel(trr)     
+     drawPixel(trr)
+
+    drawPixel(blrz)
+    drawPixel(brrz)
+    drawPixel(tlrz)
+    drawPixel(trrz)
+
+    // frontmost square
+    drawLine(blr, brr)
+    drawLine(blr, tlr)
+    drawLine(tlr, trr)
+    drawLine(brr, trr)
+
+    // z square
+    drawLine(blrz, brrz)
+    drawLine(blrz, tlrz)
+    drawLine(tlrz, trrz)
+    drawLine(brrz, trrz)
+
+    // connect the squares
+    drawLine(blr, blrz)
+    drawLine(brr, brrz)
+    drawLine(tlr, tlrz)
+    drawLine(trr, trrz)
    }
   
     var canvas = document.getElementById("canvas");
     var context = canvas.getContext("2d");
 
-    //Background
- 
     setInterval(update, 33)
-    // setTimeout(update(33))
-
-    
 </script>
 
+</body>
+</html>
+
+<!--
+
+
+
+
+
+
+-->
