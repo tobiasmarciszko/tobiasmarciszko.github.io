@@ -24,7 +24,7 @@ canvas {
 
 <script>
 
-    let angle = 2 * Math.PI / 360;
+    let angle = 2 * Math.PI / 1480;
 
     var bl = {x:-1, y:-1, z:5}
     var br = {x:1, y:-1, z:5}
@@ -62,7 +62,7 @@ function rotateY(p) {
 
 function drawPixel(point) {
      context.fillStyle = "#222"
-     context.fillRect(point.x, point.y, 2, 2)
+     context.fillRect(point.x, point.y, 1, 1)
    }
 
 
@@ -81,23 +81,23 @@ function drawLine(p0, p1) {
      
      bl = rotateZ(bl)
      br = rotateZ(br)
-     tl = rotateZ(tl)
+     tl = rotateX(tl)
      tr = rotateZ(tr)
-     blz = rotateZ(blz)
-     brz = rotateZ(brz)
-     tlz = rotateZ(tlz)
-     trz = rotateZ(trz)
+     blz = rotateY(blz)
+     brz = rotateY(brz)
+     tlz = rotateX(tlz)
+     trz = rotateY(trz)
 
     bl = rotateX(bl)
     br = rotateX(br)
     tl = rotateX(tl)
     tr = rotateX(tr)
-    blz = rotateX(blz)
-    brz = rotateX(brz)
+    blz = rotateZ(blz)
+    brz = rotateZ(brz)
     tlz = rotateX(tlz)
-    trz = rotateX(trz)
+    trz = rotateZ(trz)
 
-    bl = rotateY(bl)
+    bl = rotateX(bl)
     br = rotateY(br)
     tl = rotateY(tl)
     tr = rotateY(tr)
@@ -145,7 +145,6 @@ function drawLine(p0, p1) {
     drawLine(trr, trrz)
     
     flip();
-    setTimeout(update, 33)
    }
   
     var canvas  = document.getElementById("canvas2");
@@ -159,7 +158,7 @@ function drawLine(p0, p1) {
     canvas2.style.visibility = 'hidden';
 
     update()
-    // setInterval(update, 33)
+    setInterval(update, 16,6667)
 
     function flip() {
         if (canvas1.style.visibility === 'visible') {
