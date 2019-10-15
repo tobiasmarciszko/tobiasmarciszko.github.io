@@ -76,28 +76,19 @@ function drawLine(p0, p1) {
 }
 
    function update() {
-     context.fillStyle = "darkgrey";
-     context.fillRect(0, 0, 640, 480);
+    context.fillStyle = "darkgrey";
+    context.fillRect(0, 0, 640, 480);
      
-     bl = rotateZ(bl)
-     br = rotateZ(br)
-     tl = rotateX(tl)
-     tr = rotateZ(tr)
-     blz = rotateY(blz)
-     brz = rotateY(brz)
-     tlz = rotateX(tlz)
-     trz = rotateY(trz)
-
-    bl = rotateX(bl)
-    br = rotateX(br)
-    tl = rotateX(tl)
-    tr = rotateX(tr)
+    bl = rotateZ(bl)
+    br = rotateZ(br)
+    tl = rotateZ(tl)
+    tr = rotateZ(tr)
     blz = rotateZ(blz)
     brz = rotateZ(brz)
-    tlz = rotateX(tlz)
+    tlz = rotateZ(tlz)
     trz = rotateZ(trz)
 
-    bl = rotateX(bl)
+    bl = rotateY(bl)
     br = rotateY(br)
     tl = rotateY(tl)
     tr = rotateY(tr)
@@ -106,59 +97,87 @@ function drawLine(p0, p1) {
     tlz = rotateY(tlz)
     trz = rotateY(trz)
 
-     var blr = worldToScreen(bl)
-     var brr = worldToScreen(br)
-     var tlr = worldToScreen(tl)
-     var trr = worldToScreen(tr)
+    // bl = rotateX(bl)
+    // br = rotateX(br)
+    // tl = rotateX(tl)
+    // tr = rotateX(tr)
+    // blz = rotateX(blz)
+    // brz = rotateX(brz)
+    // tlz = rotateX(tlz)
+    // trz = rotateX(trz)
+
+    var blr = worldToScreen(bl)
+    var brr = worldToScreen(br)
+    var tlr = worldToScreen(tl)
+    var trr = worldToScreen(tr)
 
     var blrz = worldToScreen(blz)
     var brrz = worldToScreen(brz)
     var tlrz = worldToScreen(tlz)
     var trrz = worldToScreen(trz)
     
-    drawPixel(blr)
-    drawPixel(brr)
-    drawPixel(tlr)
-    drawPixel(trr)
+    let face1z = (bl.z + br.z + tr.z + tl.z) / 4;
+    let face2z = (blz.z + brz.z + trz.z + tlz.z) / 4;  
+    let face3z = (bl.z + tl.z + tlz.z + blz.z) / 4;
+    let face4z = (br.z + tr.z + trz.z + brz.z) / 4;
+    let face5z = (tl.z + tr.z + trz.z + tlz.z) / 4;
+    let face6z = (bl.z + br.z + brz.z + blz.z) / 4;
 
-    drawPixel(blrz)
-    drawPixel(brrz)
-    drawPixel(tlrz)
-    drawPixel(trrz)
+    let front = {p1: blr, p2: brr, p3: trr, p4: tlr, color: "#FF0000", z: face1z};
+    let back = {p1: blrz, p2: brrz, p3: trrz, p4: tlrz, color: "#00FF00", z: face2z};
+    let left = {p1: blr, p2: tlr, p3: tlrz, p4: blrz, color: "#0000FF", z: face3z};  
+    let right = {p1: brr, p2: trr, p3: trrz, p4: brrz, color: "#00FFFF", z: face4z};
+    let top = {p1: tlr, p2: trr, p3: trrz, p4: tlrz, color: "#FF00FF", z: face5z};
+    let bottom = {p1: blr, p2: brr, p3: brrz, p4: blrz, color: "#FFFF00", z: face6z};
 
-    // frontmost square
-    drawLine(blr, brr)
-    drawLine(blr, tlr)
-    drawLine(tlr, trr)
-    drawLine(brr, trr)
-
-    // z square
-    drawLine(blrz, brrz)
-    drawLine(blrz, tlrz)
-    drawLine(tlrz, trrz)
-    drawLine(brrz, trrz)
-
-    // connect the squares
-    drawLine(blr, blrz)
-    drawLine(brr, brrz)
-    drawLine(tlr, tlrz)
-    drawLine(trr, trrz)
+    var faces = [front, back, left, right, top, bottom];
+    faces.sort(zSort);
+    faces.forEach(drawFace);
     
     flip();
+    requestAnimationFrame(update);
+   } 
+
+   function zSort(a, b) {
+       let aZ = a.z;
+       let bZ = b.z;
+
+       if (aZ < bZ) { return 1; }
+       if (aZ > bZ) { return -1; }
+
+       return 0;
    }
-  
+
+   function drawFace(face) {
+
+    let p1 = face.p1;
+    let p2 = face.p2;
+    let p3 = face.p3;
+    let p4 = face.p4;
+
+    var ctx = context;
+    
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.closePath();
+    ctx.stroke();
+    context.fillStyle = face.color;
+    ctx.fill();
+   }
+
     var canvas  = document.getElementById("canvas2");
     var context = canvas.getContext("2d");
 
     var canvas1 = document.getElementById("canvas1");
     var canvas2 = document.getElementById("canvas2");
 
-    canvas.style.visibility = 'hidden';
     canvas1.style.visibility = 'visible';
     canvas2.style.visibility = 'hidden';
 
     update()
-    setInterval(update, 16,6667)
 
     function flip() {
         if (canvas1.style.visibility === 'visible') {
