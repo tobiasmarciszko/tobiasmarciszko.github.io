@@ -3,7 +3,7 @@
 <head>
 <style>
 body {
-  background-color: black;
+  background-color: darkgrey;
 }
 
 canvas {
@@ -18,10 +18,13 @@ canvas {
 
 <body>
 <div>
-<canvas id="canvas" width=640 height=480 class="canvas"></canvas>
+<canvas id="canvas1" width=640 height=480 class="canvas"></canvas>
+<canvas id="canvas2" width=640 height=480 class="canvas"></canvas>
 </div>
 
 <script>
+
+    let angle = 2 * Math.PI / 360;
 
     var bl = {x:-1, y:-1, z:5}
     var br = {x:1, y:-1, z:5}
@@ -35,77 +38,45 @@ canvas {
 
 function worldToScreen(p) {
     let factor = 640
-    var screen = {x: p.x / p.z * factor + 320, y: p.y / p.z * factor + 240}
+    let screen = {x: p.x / p.z * factor + 320, y: p.y / p.z * factor + 240}
     return screen
 }
 
 function rotateZ(p) {
-  var angle = 0.0174444
-  var point = {x: p.x*Math.cos(angle) - p.y*Math.sin(angle), y:p.y*Math.cos(angle) + p.x*Math.sin(angle), z: p.z}
-  return point;
+  return {x: p.x*Math.cos(angle) - p.y*Math.sin(angle), y:p.y*Math.cos(angle) + p.x*Math.sin(angle), z: p.z}
 }
 
 function rotateX(p) {
-    var angle = 0.0174444
-    var z = p.z - 6
-    var y = p.y*Math.cos(angle) - z*Math.sin(angle)
-    var zz = (p.y*Math.sin(angle) + z*Math.cos(angle)) + 6
-    var point = {x: p.x, y: y, z: zz}
-    return point
+    let z = p.z - 6
+    let y = p.y*Math.cos(angle) - z*Math.sin(angle)
+    let zz = (p.y*Math.sin(angle) + z*Math.cos(angle)) + 6
+    return {x: p.x, y: y, z: zz}
 }
 
 function rotateY(p) {
-    var angle = 0.0174444
-    var z = p.z - 6
-    var x = p.x*Math.cos(angle) + z*Math.sin(angle)
-    var zz = (-p.x*Math.sin(angle) + z*Math.cos(angle)) + 6
-    var point = {x: x, y: p.y, z: zz}
-    return point
+    let z = p.z - 6
+    let x = p.x*Math.cos(angle) + z*Math.sin(angle)
+    let zz = (-p.x*Math.sin(angle) + z*Math.cos(angle)) + 6
+    return {x: x, y: p.y, z: zz}
 }
 
 function drawPixel(point) {
-     context.fillStyle = "#FFFF"
-     context.fillRect(point.x, point.y, 1, 1)
+     context.fillStyle = "#222"
+     context.fillRect(point.x, point.y, 2, 2)
    }
 
 
 function drawLine(p0, p1) {
-    var x0 = parseInt(p0.x)
-    var x1 = parseInt(p1.x)
-
-    var y0 = parseInt(p0.y)
-    var y1 = parseInt(p1.y)
-
-    var dx = Math.abs(x1 - x0)
-    var dy = Math.abs(y1 - y0)
-    var sx = (x0 < x1) ? 1 : -1
-    var sy = (y0 < y1) ? 1 : -1
-    var err = dx - dy
-
-    while (x0!=x1 || y0!=y1) {
-       if (x0 >= 0 &&
-           y0 >= 0 &&
-           x0 < 640 &&
-           y0 < 480) {
-           var p = {x: x0, y: y0}
-           drawPixel(p)
-       }
-
-       var e2 = 2 * err
-       if (e2 > -dy) {
-        err -= dy
-        x0 += sx
-       }
-
-       if (e2 < dx) {
-        err += dx
-        y0 += sy
-       }
-    }
+    context.beginPath();
+    context.moveTo(p0.x, p0.y);
+    context.lineTo(p1.x, p1.y);
+    context.lineWidth = "2"
+    context.strokeStyle = "#222";
+    context.stroke();
 }
 
    function update() {
-     context.fillStyle = "#000";
+     context.fillStyle = "darkgrey";
      context.fillRect(0, 0, 640, 480);
      
      bl = rotateZ(bl)
@@ -144,11 +115,11 @@ function drawLine(p0, p1) {
     var brrz = worldToScreen(brz)
     var tlrz = worldToScreen(tlz)
     var trrz = worldToScreen(trz)
-     
-     drawPixel(blr)
-     drawPixel(brr)
-     drawPixel(tlr)
-     drawPixel(trr)
+    
+    drawPixel(blr)
+    drawPixel(brr)
+    drawPixel(tlr)
+    drawPixel(trr)
 
     drawPixel(blrz)
     drawPixel(brrz)
@@ -172,12 +143,41 @@ function drawLine(p0, p1) {
     drawLine(brr, brrz)
     drawLine(tlr, tlrz)
     drawLine(trr, trrz)
+    
+    flip();
+    setTimeout(update, 33)
    }
   
-    var canvas = document.getElementById("canvas");
+    var canvas  = document.getElementById("canvas2");
     var context = canvas.getContext("2d");
 
-    setInterval(update, 33)
+    var canvas1 = document.getElementById("canvas1");
+    var canvas2 = document.getElementById("canvas2");
+
+    canvas.style.visibility = 'hidden';
+    canvas1.style.visibility = 'visible';
+    canvas2.style.visibility = 'hidden';
+
+    update()
+    // setInterval(update, 33)
+
+    function flip() {
+        if (canvas1.style.visibility === 'visible') {
+            canvas1.style.visibility = 'hidden';
+            canvas  = document.getElementById("canvas1");
+            context = canvas.getContext("2d");
+        } else if (canvas1.style.visibility === 'hidden') {
+            canvas1.style.visibility = 'visible';
+        }
+
+        if (canvas2.style.visibility === 'visible') {
+            canvas2.style.visibility = 'hidden';
+            canvas  = document.getElementById("canvas2");
+            context = canvas.getContext("2d");
+        } else if (canvas2.style.visibility === 'hidden') {
+            canvas2.style.visibility = 'visible';
+        }       
+    }
 </script>
 
 </body>
