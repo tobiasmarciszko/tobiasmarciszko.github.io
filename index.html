@@ -6,20 +6,24 @@ body {
   background-color: darkgrey;
 }
 
-canvas {
-    position: fixed;
+.parent {
+    position: relative;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); 
+    border: 1px solid black;
+    width: 640px;
+    height: 480px;
+    resize: both;
+    overflow: scroll;
 }
 
 </style>
 </head>
 
 <body>
-<div>
-<canvas id="canvas1" width=640 height=480 class="canvas"></canvas>
-<canvas id="canvas2" width=640 height=480 class="canvas"></canvas>
+<div id="parent" class="parent">
+    <canvas id="canvas"></canvas>
 </div>
 
 <script>
@@ -46,8 +50,8 @@ canvas {
     var trz = {x:1, y:1, z:7}
 
 function worldToScreen(p) {
-    let factor = 640
-    var screen = {x: p.x / p.z * factor + 320, y: p.y / p.z * factor + 240}
+    let factor = canvas.width;
+    var screen = {x: p.x / p.z * factor + (canvas.width/2), y: p.y / p.z * factor + (canvas.height / 2)}
 
     screen.y = screen.y + 40*Math.sin(elapsed / 20);
     return screen
@@ -86,9 +90,14 @@ function drawLine(p0, p1) {
     context.stroke();
 }
 
-   function update() {
+function update() {
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+
+    requestAnimationFrame(update);
+
     context.fillStyle = "darkgrey";
-    context.fillRect(0, 0, 640, 480);
+    context.fillRect(0, 0, canvas.width, canvas.height);
      
     if (rotZ === true) {
         bl = rotateZ(bl)
@@ -150,8 +159,6 @@ function drawLine(p0, p1) {
     faces.sort(zSort);
     faces.forEach(drawFace);
     
-    flip();
-    requestAnimationFrame(update);
     elapsed++;
 
     if (elapsed === 500) {
@@ -200,34 +207,11 @@ function drawLine(p0, p1) {
     }
    }
 
-    var canvas  = document.getElementById("canvas2");
+    var parent = document.getElementById("parent");
+    var canvas  = document.getElementById("canvas");
     var context = canvas.getContext("2d");
 
-    var canvas1 = document.getElementById("canvas1");
-    var canvas2 = document.getElementById("canvas2");
-
-    canvas1.style.visibility = 'visible';
-    canvas2.style.visibility = 'hidden';
-
     update()
-
-    function flip() {
-        if (canvas1.style.visibility === 'visible') {
-            canvas1.style.visibility = 'hidden';
-            canvas  = document.getElementById("canvas1");
-            context = canvas.getContext("2d");
-        } else if (canvas1.style.visibility === 'hidden') {
-            canvas1.style.visibility = 'visible';
-        }
-
-        if (canvas2.style.visibility === 'visible') {
-            canvas2.style.visibility = 'hidden';
-            canvas  = document.getElementById("canvas2");
-            context = canvas.getContext("2d");
-        } else if (canvas2.style.visibility === 'hidden') {
-            canvas2.style.visibility = 'visible';
-        }       
-    }
 </script>
 
 </body>
