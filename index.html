@@ -143,7 +143,6 @@ function update() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // starfield
-
     stars.forEach(function(star) {
         
         if (star.speed === 1) {
@@ -164,14 +163,13 @@ function update() {
         }
     );
 
-
     // text scroller
     let scrollerPos = 20*Math.cos(elapsed / 10) + 10;
 
     context.fillStyle = "darkblue";
     context.fillRect(0, scrollerPos+10, canvas.width, 30);
     context.font = '14px "Press Start 2P"';
-    let text = "Hello and welcome to this playground! Here you'll see some basic routines for projection using embedded Javascript. The rotating cube is made up from 3D coordinates projected on to a 2D plane using a simple world to screen conversion. The scroller is just a text with an offseted starting point."
+    let text = "Hello and welcome to this playground! Here you'll see some basic routines for projection using embedded Javascript. The rotating cube is made up from 3D coordinates projected on to a 2D plane using a simple world to screen conversion. The scroller is just a text with an offseted starting point. Source is embedded in the page and also available on github under https://github.com/tobiasmarciszko/tobiasmarciszko.github.io. Have fun! :)"
     let textLength = context.measureText(text).width;
     context.fillStyle = "white";
     context.fillText(text,scrollPos,scrollerPos+30);
@@ -180,6 +178,8 @@ function update() {
         scrollPos = 640;
     }
     
+    // Cube
+
     if (rotZ === true) {
         bl = rotateZ(bl)
         br = rotateZ(br)
