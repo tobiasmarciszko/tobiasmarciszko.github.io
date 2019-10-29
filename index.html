@@ -1,35 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-body {
-  background-color: darkgrey;
-}
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />           
+</head>
 
-.parent {
-    position: fixed;
+
+<style>
+        html, body, pre, code, kbd, samp, canvas {
+            font-family: "Press Start 2P";
+            }
+
+body {
+    background-color: darkgrey;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); 
-    border: 1px solid black;
-    width: 640px;
-    height: 480px;
-    resize: both;
-    overflow: scroll;
+}
+
+.parent {
+    /* position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);  */
+    width: 700px;
+    height: 500px;
+    /* resize: both;
+    overflow: scroll; */
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 50px;
+}
+
+canvas {
+    border: 4px solid black;
 }
 
 </style>
 </head>
 
 <body>
-<div id="parent" class="parent">
-    <canvas id="canvas"></canvas>
+    <div class="flex-column">
+        <div id="parent" class="parent">
+            <canvas id="canvas"></canvas>    
+        </div>
+        <div class="buttons">
+            <button type="button" class="nes-btn is-primary" width="100" height="20" onclick="fill=!fill">Change fill mode</button>
+            <button type="button" class="nes-btn is-warning" width="100" height="20" onclick="randomizeRotation()">Randomize rotation</button>
+        </div>
 </div>
 
 <script>
 
     var elapsed = 0;
     var fill = true;
+    var scrollPos = 640;
 
     var angleX = 2 * Math.PI / 1480;
     var angleY = 2 * Math.PI / 1480;
@@ -94,11 +123,24 @@ function update() {
     canvas.width = parent.offsetWidth;
     canvas.height = parent.offsetHeight;
 
-    requestAnimationFrame(update);
-
     context.fillStyle = "darkgrey";
     context.fillRect(0, 0, canvas.width, canvas.height);
-     
+
+    // text scroller
+    let scrollerPos = 20*Math.cos(elapsed / 10) + 10;
+
+    context.fillStyle = "darkblue";
+    context.fillRect(0, scrollerPos+10, canvas.width, 30);
+    context.font = '14px "Press Start 2P"';
+    let text = "Hello and welcome to this playground! Here you'll see some basic routines for projection using embedded Javascript. The rotating cube is made up from 3D coordinates projected on to a 2D plane using a simple world to screen conversion. The scroller is just a text with an offseted starting point."
+    let textLength = context.measureText(text).width;
+    context.fillStyle = "white";
+    context.fillText(text,scrollPos,scrollerPos+30);
+    
+    if (scrollPos + textLength <= 0) {
+        scrollPos = 640;
+    }
+    
     if (rotZ === true) {
         bl = rotateZ(bl)
         br = rotateZ(br)
@@ -159,20 +201,28 @@ function update() {
     faces.sort(zSort);
     faces.forEach(drawFace);
     
-    elapsed++;
-
     if (elapsed === 500) {
         fill = !fill;
-        var min = 360;
-        var max = 3600;
-        
+        randomizeRotation();
+        elapsed = 0;
+    }
+
+    elapsed++;
+    scrollPos--;
+
+    requestAnimationFrame(update);
+   } 
+
+   function randomizeRotation() {
+        fill= !fill;
+        let min = -720;
+        let max = 720;
+            
         angleX = 2 * Math.PI / (Math.random()*(max - min) + min);
         angleY = 2 * Math.PI / (Math.random()*(max - min) + min);
         angleZ = 2 * Math.PI / (Math.random()*(max - min) + min);
-
         elapsed = 0;
-    }
-   } 
+   }
 
    function zSort(a, b) {
        let aZ = a.z;
@@ -211,7 +261,7 @@ function update() {
     var canvas  = document.getElementById("canvas");
     var context = canvas.getContext("2d");
 
-    update()
+    requestAnimationFrame(update)
 </script>
 
 </body>
