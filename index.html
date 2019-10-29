@@ -12,7 +12,7 @@
             }
 
 body {
-    background-color: darkgrey;
+    background-color: gray;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -51,10 +51,18 @@ canvas {
         <div class="buttons">
             <button type="button" class="nes-btn is-primary" width="100" height="20" onclick="fill=!fill">Change fill mode</button>
             <button type="button" class="nes-btn is-warning" width="100" height="20" onclick="randomizeRotation()">Randomize rotation</button>
+            <button type="button" class="nes-btn is-warning" width="100" height="20" onclick="changeDirection()">Switch direction</button>
         </div>
 </div>
 
 <script>
+
+    var parent = document.getElementById("parent");
+    var canvas  = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
 
     var elapsed = 0;
     var fill = true;
@@ -78,6 +86,14 @@ canvas {
     var tlz = {x:-1, y:1, z:7}
     var trz = {x:1, y:1, z:7}
 
+    var star = {x: 0, y: 0, speed: 0};
+    var stars = [];
+
+    for (var i = 0; i < 400; i++) {
+        let star = {x: rand(0, 750), y: rand(0, 500), speed: rand(1, 5)};
+        stars.push(star);
+    }
+    
 function worldToScreen(p) {
     let factor = canvas.width;
     var screen = {x: p.x / p.z * factor + (canvas.width/2), y: p.y / p.z * factor + (canvas.height / 2)}
@@ -123,8 +139,31 @@ function update() {
     canvas.width = parent.offsetWidth;
     canvas.height = parent.offsetHeight;
 
-    context.fillStyle = "darkgrey";
+    context.fillStyle = "black";
     context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // starfield
+
+    stars.forEach(function(star) {
+        
+        if (star.speed === 1) {
+            context.fillStyle = "darkgray";
+        }
+
+        if (star.speed === 2) {
+            context.fillStyle = "lightgray";
+        }
+
+        if (star.speed === 3) {
+            context.fillStyle = "white";
+        }       
+
+        context.fillRect(star.x, star.y, 1, 1);
+        star.x = (star.x - star.speed);
+        if (star.x <= 0) { star.x = 750; }
+        }
+    );
+
 
     // text scroller
     let scrollerPos = 20*Math.cos(elapsed / 10) + 10;
@@ -201,12 +240,6 @@ function update() {
     faces.sort(zSort);
     faces.forEach(drawFace);
     
-    if (elapsed === 500) {
-        fill = !fill;
-        randomizeRotation();
-        elapsed = 0;
-    }
-
     elapsed++;
     scrollPos--;
 
@@ -215,13 +248,22 @@ function update() {
 
    function randomizeRotation() {
         fill= !fill;
-        let min = -720;
+        let min = 180;
         let max = 720;
             
-        angleX = 2 * Math.PI / (Math.random()*(max - min) + min);
-        angleY = 2 * Math.PI / (Math.random()*(max - min) + min);
-        angleZ = 2 * Math.PI / (Math.random()*(max - min) + min);
-        elapsed = 0;
+        angleX = 2 * Math.PI / rand(min, max);
+        angleY = 2 * Math.PI / rand(min, max);
+        angleZ = 2 * Math.PI / rand(min, max);
+   }
+
+   function changeDirection() {
+       angleX *= -1;
+       angleY *= -1;
+       angleZ *= -1;
+   }
+
+   function rand(min, max) {
+        return Math.floor(Math.random() * max) + min;
    }
 
    function zSort(a, b) {
@@ -249,19 +291,20 @@ function update() {
     ctx.lineTo(p3.x, p3.y);
     ctx.lineTo(p4.x, p4.y);
     ctx.closePath();
-    ctx.stroke();
+
     context.fillStyle = face.color;
 
     if (fill === true)  {
+        context.strokeStyle = "black";
         ctx.fill();
+    } else {
+        context.strokeStyle = "white";
     }
+    ctx.stroke();
    }
 
-    var parent = document.getElementById("parent");
-    var canvas  = document.getElementById("canvas");
-    var context = canvas.getContext("2d");
-
     requestAnimationFrame(update)
+    
 </script>
 
 </body>
