@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />           
+</head>
+
+
+<style>
+        html, body, pre, code, kbd, samp, canvas {
+            font-family: "Press Start 2P";
+            }
+
+body {
+    background-color: gray;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+}
+
+.parent {
+    /* position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);  */
+    width: 700px;
+    height: 500px;
+    /* resize: both;
+    overflow: scroll; */
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 50px;
+}
+
+canvas {
+    border: 4px solid black;
+}
+
+</style>
+</head>
+
+<body>
+    <div class="flex-column">
+        <div id="parent" class="parent">
+            <canvas id="canvas"></canvas>    
+        </div>
+        <div class="buttons">
+            <button type="button" class="nes-btn is-primary" width="100" height="20" onclick="fill=!fill">Change fill mode</button>
+            <button type="button" class="nes-btn is-warning" width="100" height="20" onclick="randomizeRotation()">Randomize rotation</button>
+            <button type="button" class="nes-btn is-warning" width="100" height="20" onclick="changeDirection()">Switch direction</button>
+        </div>
+</div>
+
+<script>
+
+    var parent = document.getElementById("parent");
+    var canvas  = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+
+    var elapsed = 0;
+    var fill = true;
+    var scrollPos = 640;
+
+    var angleX = 2 * Math.PI / 1480;
+    var angleY = 2 * Math.PI / 1480;
+    var angleZ = 2 * Math.PI / 1480;
+
+    var rotX = true;
+    var rotY = true;
+    var rotZ = true;
+
+    var cube = createCube(0, 0, 10, 0);
+
+    var cubes = [];
+
+    for (var x = -1; x < 1; x+=0.2) {
+        for (var z = 0.1; z < 6; z++) {
+            cubes.push(createCube(x, 0.3, z, 0.1));
+        }
+    }
+
+    var star = {x: 0, y: 0, speed: 0};
+    var stars = [];
+
+    for (var i = 0; i < 400; i++) {
+        let star = {x: rand(0, 750), y: rand(0, 500), speed: rand(1, 5)};
+        stars.push(star);
+    }
+
+// position: x: 0, y: 0, z: 6
+// size 2 (length of one side)
+function createCube(x, y, z, size) {
+    var start = {"x": x, "y": y, "z": z, "size": size};
+
+    var bl = {x: x-size/2, y:y-size/2, z:z-size/2}
+    var br = {x: x+size/2, y:y-size/2, z:z-size/2}
+    var tl = {x:x-size/2, y:y+size/2, z:z-size/2}
+    var tr = {x:x+size/2, y:y+size/2, z:z-size/2}
+
+    var blz = {x:x-size/2, y:y-size/2, z:z+size/2}
+    var brz = {x:x+size/2, y:y-size/2, z:z+size/2}
+    var tlz = {x:x-size/2, y:y+size/2, z:z+size/2}
+    var trz = {x:x+size/2, y:y+size/2, z:z+size/2}
+
+    return {
+        "bl": bl, 
+        "br": br, 
+        "tl": tl, 
+        "tr": tr, 
+        "blz": blz,
+        "brz": brz,
+        "tlz": tlz, 
+        "trz": trz,
+        "start": start
+        };
+}
+
+function worldToScreen(p, offset) {
+    let factor = canvas.width;
+    var screen = {x: p.x / p.z * factor + (canvas.width/2), y: p.y / p.z * factor + (canvas.height / 2)}
+
+    screen.y = screen.y + 40*Math.sin(elapsed / 20) + offset;
+    return screen
+}
+
+function rotateCubeZ(cube) {
+    let bl = rotateZ(cube.bl, cube.start);
+    let br = rotateZ(cube.br, cube.start);
+    let tl = rotateZ(cube.tl, cube.start);
+    let tr = rotateZ(cube.tr, cube.start);
+    let blz = rotateZ(cube.blz, cube.start);
+    let brz = rotateZ(cube.brz, cube.start);
+    let tlz = rotateZ(cube.tlz, cube.start);
+    let trz = rotateZ(cube.trz, cube.start);
+    return {
+        "bl": bl, 
+        "br": br, 
+        "tl": tl, 
+        "tr": tr, 
+        "blz": blz,
+        "brz": brz,
+        "tlz": tlz, 
+        "trz": trz,
+        "start": cube.start
+        }; 
+}
+
+function rotateCubeX(cube) {
+    let bl = rotateX(cube.bl, cube.start);
+    let br = rotateX(cube.br, cube.start);
+    let tl = rotateX(cube.tl, cube.start);
+    let tr = rotateX(cube.tr, cube.start);
+    let blz = rotateX(cube.blz, cube.start);
+    let brz = rotateX(cube.brz, cube.start);
+    let tlz = rotateX(cube.tlz, cube.start);
+    let trz = rotateX(cube.trz, cube.start);
+    return {
+        "bl": bl, 
+        "br": br, 
+        "tl": tl, 
+        "tr": tr, 
+        "blz": blz,
+        "brz": brz,
+        "tlz": tlz, 
+        "trz": trz,
+        "start": cube.start
+        }; 
+}
+
+function rotateCubeY(cube) {
+    let bl = rotateY(cube.bl, cube.start);
+    let br = rotateY(cube.br, cube.start);
+    let tl = rotateY(cube.tl, cube.start);
+    let tr = rotateY(cube.tr, cube.start);
+    let blz = rotateY(cube.blz, cube.start);
+    let brz = rotateY(cube.brz, cube.start);
+    let tlz = rotateY(cube.tlz, cube.start);
+    let trz = rotateY(cube.trz, cube.start);
+    return {
+        "bl": bl, 
+        "br": br, 
+        "tl": tl, 
+        "tr": tr, 
+        "blz": blz,
+        "brz": brz,
+        "tlz": tlz, 
+        "trz": trz,
+        "start": cube.start
+        }; 
+}
+
+function translateY(cube, value) {
+
+    var bl  = cube.bl; 
+    var br  = cube.br; 
+    var tl  = cube.tl; 
+    var tr  = cube.tr; 
+    var blz = cube.blz;
+    var brz = cube.brz;
+    var tlz = cube.tlz;
+    var trz = cube.trz;
+    var start = cube.start;
+
+    bl.y  = cube.bl.y+value;
+    br.y  = cube.br.y+value;
+    tl.y  = cube.tl.y+value;
+    tr.y  = cube.tr.y+value;
+    blz.y = cube.blz.y+value;
+    brz.y = cube.brz.y+value;
+    tlz.y = cube.tlz.y+value;
+    trz.y = cube.trz.y+value;
+    start.y = cube.start.y-value;
+
+    return {
+        "bl":  bl, 
+        "br":  br, 
+        "tl":  tl, 
+        "tr":  tr, 
+        "blz": blz,
+        "brz": brz,
+        "tlz": tlz, 
+        "trz": trz,
+        "start": cube.start
+        };
+}
+
+function rotateZ(p, start) {
+    let x = p.x - start.x;
+    let y = p.y - start.y;
+    return {x: x*Math.cos(angleZ) - y*Math.sin(angleZ) + start.x, y:y*Math.cos(angleZ) + x*Math.sin(angleZ) + start.y, z: p.z}
+}
+
+function rotateX(p, start) {
+    let z = p.z - start.z;
+    let y = p.y - start.y;
+
+    let yy = y*Math.cos(angleX) - z*Math.sin(angleX) + start.y
+    let zz = (y*Math.sin(angleX) + z*Math.cos(angleX)) + start.z
+    return {x: p.x, y: yy, z: zz}
+}
+
+function rotateY(p, start) {
+    let z = p.z - start.z;
+    let x = p.x - start.x;
+
+    let xx = x*Math.cos(angleY) + z*Math.sin(angleY) + start.x
+    let zz = (-x*Math.sin(angleY) + z*Math.cos(angleY)) + start.z
+    return {x: xx, y: p.y, z: zz}
+}
+
+function drawPixel(point) {
+     context.fillStyle = "#222"
+     context.fillRect(point.x, point.y, 1, 1)
+   }
+
+
+function drawLine(p0, p1) {
+    context.beginPath();
+    context.moveTo(p0.x, p0.y);
+    context.lineTo(p1.x, p1.y);
+    context.lineWidth = "2"
+    context.strokeStyle = "#222";
+    context.stroke();
+}
+
+function update() {
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+
+    context.fillStyle = "black";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // starfield
+    stars.forEach(function(star) {
+        
+        if (star.speed === 1) {
+            context.fillStyle = "darkgray";
+        }
+
+        if (star.speed === 2) {
+            context.fillStyle = "lightgray";
+        }
+
+        if (star.speed === 3) {
+            context.fillStyle = "white";
+        }       
+
+        context.fillRect(star.x, star.y, 1, 1);
+        star.x = (star.x - star.speed);
+        if (star.x <= 0) { star.x = 750; }
+        }
+    );
+
+    // text scroller
+    let scrollerPos = 20*Math.cos(elapsed / 10) + 10;
+
+    context.fillStyle = "darkblue";
+    context.fillRect(0, scrollerPos+10, canvas.width, 30);
+    context.font = '14px "Press Start 2P"';
+    let text = "Hello and welcome to this playground! Here you'll see some basic routines for projection using embedded Javascript. The rotating cube is made up from 3D coordinates projected on to a 2D plane using a simple world to screen conversion. The scroller is just a text with an offseted starting point. Source is embedded in the page and also available on github under https://github.com/tobiasmarciszko/tobiasmarciszko.github.io. Have fun! :)"
+    let textLength = context.measureText(text).width;
+    context.fillStyle = "white";
+    context.fillText(text,scrollPos,scrollerPos+30);
+    
+    if (scrollPos + textLength <= 0) {
+        scrollPos = 640;
+    }
+    
+    // Cube
+    if (rotZ === true) {
+        cube = rotateCubeZ(cube);
+    }
+
+    if (rotY === true) {
+        cube = rotateCubeY(cube);
+    }
+
+    if (rotX === true) {
+        cube = rotateCubeX(cube);
+    }
+
+    cubes.sort(zCubeSort);
+
+    for (var i = 0; i< cubes.length; i++) {        
+        cubes[i] = rotateCubeZ(cubes[i]);
+        cubes[i] = rotateCubeY(cubes[i]);
+        cubes[i] = rotateCubeX(cubes[i]);
+
+        drawCube(cubes[i], -20*Math.sin(elapsed*i*0.01745/5)-120);
+    }
+
+    // drawCube(cube);
+    
+    elapsed++;
+    scrollPos--;
+
+    requestAnimationFrame(update);
+   } 
+
+    function drawCube(cube, offset) {
+        let blr = worldToScreen(cube.bl, offset)
+        let brr = worldToScreen(cube.br, offset)
+        let tlr = worldToScreen(cube.tl, offset)
+        let trr = worldToScreen(cube.tr, offset)
+        let blrz = worldToScreen(cube.blz, offset)
+        let brrz = worldToScreen(cube.brz, offset)
+        let tlrz = worldToScreen(cube.tlz, offset)
+        let trrz = worldToScreen(cube.trz, offset)
+
+        let face1z = (cube.bl.z  + cube.br.z  + cube.tr.z  + cube.tl.z) / 4;
+        let face2z = (cube.blz.z + cube.brz.z + cube.trz.z + cube.tlz.z) / 4;  
+        let face3z = (cube.bl.z  + cube.tl.z  + cube.tlz.z + cube.blz.z) / 4;
+        let face4z = (cube.br.z  + cube.tr.z  + cube.trz.z + cube.brz.z) / 4;
+        let face5z = (cube.tl.z  + cube.tr.z  + cube.trz.z + cube.tlz.z) / 4;
+        let face6z = (cube.bl.z  + cube.br.z  + cube.brz.z + cube.blz.z) / 4;
+
+        let front = {p1: blr, p2: brr, p3: trr, p4: tlr, color: "#bb2222", z: face1z};
+        let back = {p1: blrz, p2: brrz, p3: trrz, p4: tlrz, color: "#22bb22", z: face2z};
+        let left = {p1: blr, p2: tlr, p3: tlrz, p4: blrz, color: "#2222bb", z: face3z};  
+        let right = {p1: brr, p2: trr, p3: trrz, p4: brrz, color: "#22bbbb", z: face4z};
+        let top = {p1: tlr, p2: trr, p3: trrz, p4: tlrz, color: "#bb22bb", z: face5z};
+        let bottom = {p1: blr, p2: brr, p3: brrz, p4: blrz, color: "#bbbb22", z: face6z};
+
+        var faces = [front, back, left, right, top, bottom];
+        faces.sort(zSort);
+        faces.forEach(drawFace);
+   }
+
+   function randomizeRotation() {
+        fill= !fill;
+        let min = 180;
+        let max = 720;
+            
+        angleX = 2 * Math.PI / rand(min, max);
+        angleY = 2 * Math.PI / rand(min, max);
+        angleZ = 2 * Math.PI / rand(min, max);
+   }
+
+   function changeDirection() {
+       angleX *= -1;
+       angleY *= -1;
+       angleZ *= -1;
+   }
+
+   function rand(min, max) {
+        return Math.floor(Math.random() * max) + min;
+   }
+
+   function zSort(a, b) {
+       let aZ = a.z;
+       let bZ = b.z;
+
+       if (aZ < bZ) { return 1; }
+       if (aZ > bZ) { return -1; }
+
+       return 0;
+   }
+   
+   function zCubeSort(a, b) {
+       let aZ = a.start.z;
+       let bZ = b.start.z;
+
+       if (aZ < bZ) { return 1; }
+       if (aZ > bZ) { return -1; }
+
+       return 0;
+   }
+
+   function drawFace(face) {
+
+    let p1 = face.p1;
+    let p2 = face.p2;
+    let p3 = face.p3;
+    let p4 = face.p4;
+
+    var ctx = context;
+    
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.closePath();
+
+    context.fillStyle = face.color;
+
+    if (fill === true)  {
+        context.strokeStyle = "black";
+        ctx.fill();
+    } else {
+        context.strokeStyle = "white";
+    }
+    ctx.stroke();
+   }
+
+    requestAnimationFrame(update)
+    
+</script>
+
+</body>
+</html>
