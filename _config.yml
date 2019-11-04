@@ -17,7 +17,7 @@ title: /dev/null
 email: tobias.marciszko@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   A blog about coding (rather, things that I learn during coding that might be interesting for others :). I will write about C++, Qt, QML, Javascript, Catch2 among other things.
-baseurl: "/blog" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://tobiasmarciszko.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: tobiasmarciszko
 github_username:  tobiasmarciszko
