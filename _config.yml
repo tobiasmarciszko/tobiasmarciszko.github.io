@@ -4,14 +4,13 @@
 title: "/dev/null"
 description: "A blog about coding."
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://tobiasmarciszko.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 
 #-------------------------------
 # About Section
 author-name:   Tobias Marciszko
 #author-avatar: 10.jpg
-
 
 #-------------------------------
 # Contact links
