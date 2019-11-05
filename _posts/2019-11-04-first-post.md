@@ -6,6 +6,7 @@ category:
 author: 
 tags: [Catch2, c++, c++11, c++17]
 summary: 
+image: asm-bg.png
 ---
 Quack! This is apparently the first post. Let's see if we can write something interesting :)
 
@@ -34,7 +35,7 @@ Next step is to iterate over our data with a [range-based for loop](https://en.c
 
 ```
 
-The structured binding inside the for loop can also be assigned directly in the the for statement: 
+The structured binding inside the for loop can also be assigned directly in the for statement: 
 
 ```cpp
     for (const auto& [index, n1, n2]: data) {
@@ -43,5 +44,8 @@ The structured binding inside the for loop can also be assigned directly in the 
         REQUIRE(equal(comps.n2, n2));
     }
 ```
+---
+
+For full details, see commit [34f2671a](https://github.com/tobiasmarciszko/qt_raytracer_challenge/commit/34f2671a6ee63beb58a731ca9c1267595fbab8c6).
 
 That's all folks! :)
