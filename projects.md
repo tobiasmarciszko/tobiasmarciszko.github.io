@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Projects
+title: Video Archive
 permalink: /projects/
 ---
 

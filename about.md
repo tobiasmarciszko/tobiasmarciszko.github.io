@@ -3,7 +3,25 @@ layout: page
 title: About
 permalink: /about/
 ---
-A blog about nothing! :) I'm writing about possibly the following topics:
+
+Welcome to [/dev/null](https://netbsd.gw.com/cgi-bin/man-cgi?null++NetBSD-current)!
+
+    NAME
+        null -- the null device
+
+    DESCRIPTION
+        The null device accepts and reads data as any ordinary (and willing) file
+        -- but throws it away.  The length of the null device is always zero.
+
+    FILES
+         /dev/null
+
+    HISTORY
+        A null device appeared in Version 4 AT&T UNIX.
+
+---
+
+This blog may or may not include topics such as:
 
 <a href="https://qt.io">
 <img alt="Qt" src="/img/qt-logo.png">
@@ -24,5 +42,4 @@ A blog about nothing! :) I'm writing about possibly the following topics:
 [The Utah teapot](https://en.wikipedia.org/wiki/Utah_teapot)
 
 
-I strongly recommend reading "The Raytracer challenge" by Jamis Buck. [The Ray Tracer Challenge](https://pragprog.com/book/jbtracer/the-ray-tracer-challenge)
-
+I strongly recommend reading [The Ray Tracer Challenge](https://pragprog.com/book/jbtracer/the-ray-tracer-challenge) by [Jamis Buck](https://twitter.com/jamis).
