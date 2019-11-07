@@ -5,7 +5,8 @@ permalink: /about/
 ---
 <!-- rotating cube -->
 <div id="parent" class="parent">
-    <canvas id="canvas" width="320" height="240"></canvas>    
+    <canvas id="canvas" width="320" height="240">
+    </canvas>   
 </div>
 
 <style>
@@ -21,7 +22,6 @@ canvas {
 
 </style>
 <script>
-
     var parent = document.getElementById("parent");
     var canvas  = document.getElementById("canvas");
     var context = canvas.getContext("2d");
