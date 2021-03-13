@@ -4,7 +4,7 @@ title: How to avoid QML binding errors on app exit
 date: 2021-03-13 09:35
 category: 
 author: 
-tags: [Qt, QML]
+tags: [Qt, QML, c++]
 summary: 
 image: qt-logo-big.png
 ---
